@@ -1,0 +1,12 @@
+<h3 class="title"><%=l(:custom_field_value_new)%></h3>
+
+<%= form_tag custom_field_values_path(@custom_field, params.slice(:name, :customized_id, :customized_type, :project_id, :tracker_id, :with_label)), remote: true do %>
+  <div class="box">
+    <p><%= text_area_tag :value, nil, required: true, rows: 10, class: 'wiki-edit' %></p>
+  </div>
+
+  <p class="buttons">
+    <%= submit_tag l(:button_create) %>
+    <%= submit_tag l(:button_cancel), onclick: "hideModal(this)", type: 'button' %>
+  </p>
+<% end %>

@@ -1,0 +1,37 @@
+<% tag_id = custom_field_tag_id(params[:name], @custom_field) %>
+<% tag_name = custom_field_tag_name(params[:name], @custom_field) %>
+
+var selected;
+
+// save selected values
+var $select = $("select[id='<%= tag_id %>']");
+if ($select.size()) {
+  // custom field is select
+  selected = $select.val();
+} else {
+  // custom field is checkboxes or radiobuttons
+  selected = $("[name='<%= tag_name %>']:checked").map(
+    function(i, o) { return $(o).val() }).get();
+}
+
+// replace with new custom field
+var $parent = $("[id='<%= custom_field_add_new_id(params[:name], @custom_field) %>']").parent();
+<% if @with_label %>
+  $parent.html("<%= escape_javascript(custom_field_tag_with_label params[:name], @custom_value) %>");
+<% else %>
+  $parent.html("<%= escape_javascript(custom_field_tag params[:name], @custom_value) %>");
+<% end %>
+
+// restore selected values
+$select = $("select[id='<%= tag_id %>']");
+if ($select.size()) {
+  // custom field is select
+  $select.val(selected);
+} else {
+  // custom field is checkboxes or radiobuttons
+  $("[name='<%= tag_name %>']").each(
+    function(i, o) {
+      $(o).prop("checked", selected.indexOf($(o).val()) != -1);
+    });
+}
+hideModal();
