@@ -3,7 +3,8 @@ class CustomField::ValuesController < ApplicationController
 
   helper :custom_fields
 
-  before_filter :find_custom_field, :find_project, :find_customized, :find_tracker, :authorize_editing
+  before_filter :find_custom_field, :find_project, :find_customized,
+                :find_tracker, :find_custom_value, :authorize_editing
 
   def new
     respond_to do |format|
@@ -14,7 +15,7 @@ class CustomField::ValuesController < ApplicationController
   def create
     @custom_field.add_possible_values params[:value]
     @custom_field.save
-    @custom_value = find_custom_value
+    @custom_value.custom_field = @custom_field
     @with_label = params[:with_label] == '1'
     respond_to do |format|
       format.js
@@ -24,7 +25,7 @@ class CustomField::ValuesController < ApplicationController
   private
 
   def find_custom_value
-    @customized.custom_field_values.find { |v| v.custom_field_id == @custom_field.id }
+    @custom_value = @customized.custom_field_values.find { |v| v.custom_field_id == @custom_field.id }
   end
 
   def find_tracker
@@ -60,7 +61,7 @@ class CustomField::ValuesController < ApplicationController
   end
 
   def authorize_editing
-    unless User.current.allowed_to_edit?(@customized, @project)
+    if !@custom_value || !User.current.allowed_to_edit?(@customized, @project)
       deny_access
     end
   end
